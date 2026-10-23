@@ -1,0 +1,698 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Dewy Bank Workshop Setup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Besley:wght@500;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: a dark-blue masthead, then one column of setup steps grouped by phase; a path switch changes who does each step. */
+:root {
+  --bg: #F3F6F9;
+  --surface: #FFFFFF;
+  --ink: #083763;
+  --ink-soft: #3E5C7A;
+  --line: #D8E2EC;
+  --brand: #083763;
+  --brand-ink: #FFFFFF;
+  --teal: #67EADD;
+  --teal-strong: #0F8F84;
+  --link: #1D60CA;
+  --you: #6B3FA0;
+  --you-bg: #F1E9F9;
+  --agent-bg: #E1FBF5;
+  --run-bg: #E3EDFB;
+  --code-bg: #0A2540;
+  --code-ink: #E6F0F8;
+  --code-dim: #8FB0CC;
+  --done: #128A5A;
+  --warn-bg: #FFF6DA;
+  --warn-ink: #6A4B00;
+  --font-display: 'Besley', Georgia, serif;
+  --font-body: 'Nunito Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #05192D; --surface: #0A2948; --ink: #E8F1F8; --ink-soft: #A9C0D6; --line: #1C4268;
+    --brand: #083763; --brand-ink: #FFFFFF; --teal: #67EADD; --teal-strong: #67EADD; --link: #69D2FF;
+    --you: #D2B8EA; --you-bg: #2B2147; --agent-bg: #0E3A44; --run-bg: #12345C;
+    --code-bg: #031222; --code-ink: #E6F0F8; --code-dim: #7F9DB8; --done: #4FD69C;
+    --warn-bg: #3A3110; --warn-ink: #F5DE8F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #05192D; --surface: #0A2948; --ink: #E8F1F8; --ink-soft: #A9C0D6; --line: #1C4268;
+  --brand: #083763; --brand-ink: #FFFFFF; --teal: #67EADD; --teal-strong: #67EADD; --link: #69D2FF;
+  --you: #D2B8EA; --you-bg: #2B2147; --agent-bg: #0E3A44; --run-bg: #12345C;
+  --code-bg: #031222; --code-ink: #E6F0F8; --code-dim: #7F9DB8; --done: #4FD69C;
+  --warn-bg: #3A3110; --warn-ink: #F5DE8F;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+}
+a { color: var(--link); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+code { font-family: var(--font-mono); font-size: 0.88em; background: var(--run-bg); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+.wrap { max-width: 860px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Masthead */
+.mast { background: var(--brand); color: var(--brand-ink); }
+.mast .wrap { padding-block: 40px 36px; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
+.eyebrow { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin: 0 0 8px; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 6vw, 48px); line-height: 1.08; margin: 0 0 14px; text-wrap: balance; }
+h1 .t { color: var(--teal); }
+.mast p.lede { margin: 0; max-width: 58ch; color: #D3E3F2; font-size: 17px; }
+.mast img { width: 112px; height: auto; display: block; }
+@media (max-width: 560px) { .mast .wrap { grid-template-columns: 1fr; } .mast img { width: 72px; order: -1; } }
+
+/* Setup panel */
+.setup { padding-block: 28px 8px; display: grid; gap: 20px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+.panel h2 { font-family: var(--font-display); font-size: 20px; margin: 0 0 4px; }
+.panel p { margin: 0; color: var(--ink-soft); }
+.fields { display: grid; grid-template-columns: 1fr 220px; gap: 14px; margin-top: 16px; }
+@media (max-width: 640px) { .fields { grid-template-columns: 1fr; } }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field label { font-size: 13px; font-weight: 700; }
+.field input { font: 15px var(--font-mono); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; width: 100%; }
+.field small { color: var(--ink-soft); font-size: 13px; }
+.bring { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 14px; font-size: 14px; color: var(--ink-soft); }
+.bring b { color: var(--ink); }
+
+/* Path switch */
+.switch { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.switch button { font: inherit; color: var(--ink); background: transparent; border: 0; padding: 16px 18px; text-align: left; cursor: pointer; display: grid; gap: 2px; }
+.switch button + button { border-left: 1px solid var(--line); }
+.switch button strong { font-family: var(--font-display); font-size: 18px; }
+.switch button span { font-size: 14px; color: var(--ink-soft); }
+.switch button[aria-pressed="true"] { background: var(--brand); color: var(--brand-ink); }
+.switch button[aria-pressed="true"] span { color: #C6DAEC; }
+.switch button[aria-pressed="true"] strong::after { content: " ✓"; color: var(--teal); }
+@media (max-width: 520px) { .switch { grid-template-columns: 1fr; } .switch button + button { border-left: 0; border-top: 1px solid var(--line); } }
+
+/* Agent kit */
+.kit h2 { margin-bottom: 6px; }
+.kit .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+.btn { font: 700 15px var(--font-body); color: var(--brand); background: var(--teal); border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
+.btn:hover { filter: brightness(0.95); }
+.btn.quiet { background: transparent; color: var(--link); padding: 10px 4px; }
+.prompt-box { margin-top: 12px; }
+.prompt-box pre { max-height: 320px; }
+.handoffs { margin-top: 16px; display: grid; gap: 6px; }
+.handoffs h3 { font-size: 14px; margin: 0; font-weight: 800; }
+.handoffs ol { margin: 0; padding-left: 22px; color: var(--ink-soft); font-size: 15px; }
+.handoffs li::marker { color: var(--you); font-weight: 700; }
+.rules { margin: 12px 0 0; padding-left: 20px; font-size: 15px; color: var(--ink-soft); }
+
+/* Progress */
+.progress { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.progress .wrap { padding-block: 10px; display: flex; align-items: center; gap: 14px; font-size: 14px; }
+.bar { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--teal-strong); transition: width .25s; }
+.progress .count { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.progress button { font: 600 13px var(--font-body); color: var(--ink-soft); background: none; border: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Steps */
+.steps { padding-block: 20px 8px; }
+.phase { margin-top: 28px; }
+.phase > h2 { font-family: var(--font-display); font-size: 24px; margin: 0 0 4px; display: flex; gap: 12px; align-items: baseline; }
+.phase > h2 .pn { font: 700 13px var(--font-mono); color: var(--teal-strong); letter-spacing: 0.06em; }
+.phase > p { margin: 0 0 14px; color: var(--ink-soft); }
+.step { display: grid; grid-template-columns: 34px 1fr; gap: 14px; padding: 18px 0; border-top: 1px solid var(--line); }
+.step .num { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 700 14px var(--font-mono); border: 2px solid var(--line); color: var(--ink-soft); background: var(--surface); }
+.step.human .num { border-color: var(--you); color: var(--you); }
+.step.done .num { background: var(--done); border-color: var(--done); color: #fff; }
+.step.done .num span { display: none; }
+.step.done .num::after { content: "✓"; }
+.body { min-width: 0; }
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.head h3 { margin: 0; font-size: 18px; font-weight: 800; line-height: 1.35; }
+.step.done .head h3 { color: var(--ink-soft); }
+.chip { font: 800 11px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.chip.you { background: var(--you-bg); color: var(--you); }
+.chip.agent { background: var(--agent-bg); color: var(--teal-strong); }
+.chip.run { background: var(--run-bg); color: var(--link); }
+.check { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); cursor: pointer; user-select: none; }
+.check input { width: 17px; height: 17px; accent-color: var(--done); }
+.body p { margin: 8px 0 0; max-width: 68ch; }
+.body ul, .body ol { margin: 8px 0 0; padding-left: 22px; max-width: 68ch; }
+.body li + li { margin-top: 4px; }
+.handoff { margin-top: 12px; border: 1.5px dashed var(--you); border-radius: 10px; padding: 10px 14px; font-size: 15px; }
+.handoff b { color: var(--you); }
+.note { margin-top: 12px; background: var(--warn-bg); color: var(--warn-ink); border-radius: 8px; padding: 10px 14px; font-size: 15px; }
+.agentsays { margin-top: 10px; font-size: 15px; color: var(--ink-soft); }
+
+/* Code */
+.code { position: relative; margin-top: 12px; }
+pre { margin: 0; background: var(--code-bg); color: var(--code-ink); font: 14px/1.6 var(--font-mono); padding: 14px 16px; padding-right: 76px; border-radius: 10px; overflow-x: auto; white-space: pre; }
+pre .c { color: var(--code-dim); }
+pre .v, .v { color: inherit; }
+pre .v { color: #67EADD; }
+.copy { position: absolute; top: 8px; right: 8px; font: 700 12px var(--font-body); color: #083763; background: #67EADD; border: 0; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+.table-wrap { overflow-x: auto; margin-top: 12px; }
+table { border-collapse: collapse; font-size: 15px; min-width: 100%; }
+th, td { text-align: left; padding: 7px 12px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+td code { white-space: nowrap; }
+
+/* Path visibility */
+body.self .only-agent, body.agent .only-self { display: none !important; }
+
+/* Trouble */
+.trouble { padding-block: 28px 56px; }
+.trouble h2 { font-family: var(--font-display); font-size: 24px; margin: 0 0 12px; }
+details { border-top: 1px solid var(--line); padding: 12px 0; }
+details:last-child { border-bottom: 1px solid var(--line); }
+summary { cursor: pointer; font-weight: 700; }
+summary code { font-weight: 400; }
+details p { margin: 8px 0 0; max-width: 68ch; color: var(--ink-soft); }
+.foot { color: var(--ink-soft); font-size: 14px; margin-top: 20px; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+
+<header class="mast">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Securing AI agents · Hands-on workshop</p>
+      <h1>Set up <span class="t">Dewy Bank</span></h1>
+      <p class="lede">By the end you'll have the workshop's three stations deployed to your own Workato workspace, and the bank app's chat talking to their six MCP servers. Do it by hand, or let a coding agent run the terminal work while you handle the steps only a person can do.</p>
+    </div>
+    <img alt="Dewy, the Workato mascot" src="data:image/png;base64,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">
+  </div>
+</header>
+
+<section class="wrap setup" aria-label="Before you start">
+  <div class="panel">
+    <h2>Your details</h2>
+    <p>Fill these in and every command on this page uses them. They stay in this browser.</p>
+    <div class="fields">
+      <div class="field">
+        <label for="in-bank">Bank app URL</label>
+        <input id="in-bank" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://xxxx.cloudfront.net">
+        <small>Your facilitator shares it at the start of the workshop.</small>
+      </div>
+      <div class="field">
+        <label for="in-profile">wk profile name</label>
+        <input id="in-profile" type="text" autocomplete="off" spellcheck="false" value="dewy">
+        <small>Any short name. Keep the default if unsure.</small>
+      </div>
+    </div>
+    <div class="bring">
+      <span><b>From your facilitator:</b> the bank app URL and the support code</span>
+      <span><b>On your laptop:</b> Python 3, Git, a code editor</span>
+      <span><b>Tested on:</b> macOS</span>
+    </div>
+  </div>
+
+  <div class="switch" role="group" aria-label="Choose how to set up">
+    <button type="button" id="path-self" aria-pressed="true"><strong>I'll do it myself</strong><span>Run each command in your own terminal.</span></button>
+    <button type="button" id="path-agent" aria-pressed="false"><strong>My coding agent drives</strong><span>Claude Code, Cursor, Kiro or any agent that runs terminal commands.</span></button>
+  </div>
+
+  <div class="panel kit only-agent">
+    <h2>Hand this to your agent</h2>
+    <p>Open your agent in the folder where you want the repo, paste the prompt below, and follow along here. Your agent runs the terminal steps and stops whenever it needs you. When it does, do the step on this page, then reply <code>done</code>.</p>
+    <div class="row">
+      <button type="button" class="btn" id="copy-prompt">Copy agent prompt</button>
+      <button type="button" class="btn quiet" id="toggle-prompt" aria-expanded="false" aria-controls="prompt-box">Show the prompt</button>
+    </div>
+    <div class="prompt-box code" id="prompt-box" hidden>
+      <pre id="prompt-text"></pre>
+    </div>
+    <ul class="rules">
+      <li>You never paste a password, token, support code or MCP URL into the agent's chat. You type secrets into the <code>.env</code> file yourself, and the agent only checks whether each one is set.</li>
+      <li>The agent doesn't sign in to Workato or the bank for you, even if it has a browser tool. Those accounts are yours.</li>
+    </ul>
+    <div class="handoffs">
+      <h3>Your agent hands off to you <span id="handoff-count">8</span> times</h3>
+      <ol id="handoff-list"></ol>
+    </div>
+  </div>
+</section>
+
+<div class="progress" aria-live="polite">
+  <div class="wrap">
+    <span class="count"><span id="done-n">0</span> of <span id="total-n">13</span> done</span>
+    <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+    <button type="button" id="reset">Reset</button>
+  </div>
+</div>
+
+<main class="wrap steps">
+
+  <section class="phase">
+    <h2><span class="pn">PHASE 1</span>Get the tools</h2>
+    <p>Everything in this phase runs in a terminal.</p>
+
+    <article class="step" data-owner="run" id="s-laptop">
+      <div class="num"><span>1</span></div>
+      <div class="body">
+        <div class="head"><h3>Check your laptop</h3></div>
+        <p class="only-self">You need Python 3 and Git. Both commands should print a version.</p>
+        <p class="only-agent agentsays">Your agent checks for Python 3 and Git and tells you if either is missing.</p>
+        <div class="code only-self"><pre>python3 --version
+git --version</pre></div>
+      </div>
+    </article>
+
+    <article class="step" data-owner="run" id="s-wk">
+      <div class="num"><span>2</span></div>
+      <div class="body">
+        <div class="head"><h3>Install the wk CLI and recipe linter</h3></div>
+        <p class="only-self"><code>wk</code> pushes the workshop's recipes and connectors to Workato. On a Mac, install both with Homebrew:</p>
+        <p class="only-agent agentsays">Your agent installs <code>wk</code> and the linter with Homebrew. If Homebrew isn't installed, it stops and asks you to install it.</p>
+        <div class="code only-self"><pre>brew install workato-devs/tap/wk workato-devs/tap/recipe-lint
+wk plugins install recipe-lint
+wk version</pre></div>
+        <p>On Windows, see the <a href="https://github.com/workato-devs/labs#install-the-toolkit" target="_blank" rel="noopener">Workato Labs install guide</a> for the Scoop commands. The rest of this guide hasn't been tested on Windows yet, so ask a facilitator if you get stuck.</p>
+      </div>
+    </article>
+
+    <article class="step" data-owner="run" id="s-clone">
+      <div class="num"><span>3</span></div>
+      <div class="body">
+        <div class="head"><h3>Clone the workshop repo</h3></div>
+        <div class="code only-self"><pre>git clone https://github.com/workato-devs/dewy-bank.git
+cd dewy-bank</pre></div>
+        <p class="only-agent agentsays">Your agent clones <code>workato-devs/dewy-bank</code> and works inside it from here on.</p>
+        <p>Clone it with Git rather than downloading a ZIP. The deploy script uses Git to put files back the way they were after it runs.</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="phase">
+    <h2><span class="pn">PHASE 2</span>Create your accounts</h2>
+    <p>Only you can do these: each one needs your email inbox.</p>
+
+    <article class="step human" data-owner="you" id="s-bank" data-handoff="Create and confirm your Dewy Bank account">
+      <div class="num"><span>4</span></div>
+      <div class="body">
+        <div class="head"><h3>Create your Dewy Bank account</h3></div>
+        <ol>
+          <li>Open the bank app at <a class="v-link" data-v="bank-link" href="#" target="_blank" rel="noopener"><span class="v" data-v="bank">your bank app URL</span></a>.</li>
+          <li>Choose <b>Sign up</b>, enter an email and password, and choose <b>Create account</b>.</li>
+          <li>Enter the 6-digit code from the confirmation email.</li>
+        </ol>
+        <p>Use an email you can check right now. You'll enter this email and password again in step 10, when you connect Workato to the bank.</p>
+      </div>
+    </article>
+
+    <article class="step human" data-owner="you" id="s-workato" data-handoff="Sign up for Workato, confirm your email, and log in">
+      <div class="num"><span>5</span></div>
+      <div class="body">
+        <div class="head"><h3>Create your Workato workspace</h3></div>
+        <ol>
+          <li>Sign up for a free account at <a href="https://app.trial.workato.com/users/sign_up_trial" target="_blank" rel="noopener">app.trial.workato.com</a>.</li>
+          <li>Confirm your email address.</li>
+          <li>Log in to Workato and keep the tab open.</li>
+        </ol>
+      </div>
+    </article>
+  </section>
+
+  <section class="phase">
+    <h2><span class="pn">PHASE 3</span>Let the CLI into your workspace</h2>
+    <p>You create a token in Workato and save it on your laptop. The CLI and the deploy script read it from there.</p>
+
+    <article class="step human" data-owner="you" id="s-client" data-handoff="Create an API client and copy its token">
+      <div class="num"><span>6</span></div>
+      <div class="body">
+        <div class="head"><h3>Create an API client</h3></div>
+        <ol>
+          <li>In Workato, go to <b>Workspace admin → API clients → Client roles</b> and create a role.</li>
+          <li>Go to <b>Workspace admin → API clients</b>, create a client, and give it that role and access to your workspace.</li>
+          <li>Copy the token. It starts with <code>wrk</code>, and Workato shows it only once.</li>
+        </ol>
+        <p>Give the role these permissions. They're what the workshop's scripts use, laid out the way the Client role editor shows them:</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Tab</th><th>Section</th><th>Permissions</th></tr></thead>
+          <tbody>
+            <tr><td>Projects</td><td>Project assets</td><td>Projects &amp; folders, Connections, Recipes, Skills, MCP servers</td></tr>
+            <tr><td>Projects</td><td>Recipe lifecycle management</td><td>Recipe lifecycle management, Export manifests</td></tr>
+            <tr><td>Tools</td><td>Connector SDKs</td><td>Connector SDKs</td></tr>
+            <tr><td>Admin</td><td>Workspace details</td><td>Workspace details</td></tr>
+          </tbody>
+        </table></div>
+        <p>If in doubt, select every permission. Your trial workspace exists only for this workshop, and a missing checkbox costs you more time later than an extra one does now.</p>
+        <p>The <a href="https://github.com/workato-devs/wk#authenticate" target="_blank" rel="noopener">wk guide</a> walks through the role and client screens, and <a href="https://github.com/workato-devs/wk/blob/develop/docs/known-limitations.md" target="_blank" rel="noopener">wk's permission map</a> says what each permission unlocks.</p>
+      </div>
+    </article>
+
+    <article class="step human" data-owner="you" id="s-env" data-handoff="Type your token, bank URL and support code into .env">
+      <div class="num"><span>7</span></div>
+      <div class="body">
+        <div class="head"><h3>Save your secrets in <code>.env</code></h3></div>
+        <p class="only-self">Create the file from the example, then open it in your editor:</p>
+        <div class="code only-self"><pre>cp .env.example .env</pre></div>
+        <p class="only-agent">Your agent creates <code>.env</code> from <code>.env.example</code>. Open it in your editor and fill in:</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Line</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td><code>WORKATO_API_TOKEN=</code></td><td>the token from step 6</td></tr>
+            <tr><td><code>SPA_URL=</code></td><td><span class="v" data-v="bank">your bank app URL</span></td></tr>
+            <tr><td><code>DEWY_SUPPORT_API_KEY=</code></td><td>the support code from your facilitator</td></tr>
+          </tbody>
+        </table></div>
+        <p>Leave the <code>A1</code>–<code>C2</code> lines as they are for now. You fill them in step 11. Git ignores <code>.env</code>, so it never gets committed.</p>
+        <div class="handoff only-agent"><b>Type these into the file, not the chat.</b> Save it and reply <code>done</code>. Your agent checks that each value is set without displaying it.</div>
+      </div>
+    </article>
+
+    <article class="step" data-owner="run" id="s-login">
+      <div class="num"><span>8</span></div>
+      <div class="body">
+        <div class="head"><h3>Sign the CLI in</h3></div>
+        <p class="only-self">Create a <code>wk</code> profile for your trial workspace. When it asks, paste the token from step 6.</p>
+        <div class="code only-self"><pre>wk auth login --region trial --environment dev --name <span class="v" data-v="profile">dewy</span>
+wk auth status -p <span class="v" data-v="profile">dewy</span></pre></div>
+        <p class="only-agent agentsays">Your agent creates the <code>wk</code> profile <code><span class="v" data-v="profile">dewy</span></code>, reading the token from <code>.env</code> so it never appears on screen.</p>
+        <p>If macOS asks whether <code>wk</code> can use your keychain, allow it.</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="phase">
+    <h2><span class="pn">PHASE 4</span>Deploy to Workato</h2>
+    <p>One script pushes the connectors, the three stations and their MCP servers. It pauses twice for you.</p>
+
+    <article class="step" data-owner="run" id="s-deploy">
+      <div class="num"><span>9</span></div>
+      <div class="body">
+        <div class="head"><h3>Run the deploy script</h3></div>
+        <div class="code only-self"><pre>python3 scripts/deploy_workato.py -p <span class="v" data-v="profile">dewy</span></pre></div>
+        <p class="only-self">It points the connectors at your bank, pushes them to your workspace, then stops and prints a link to your connections. Keep this terminal open.</p>
+        <p class="only-agent agentsays">Your agent runs the deploy script. An agent can't press Enter at the script's pauses, so the script stops at each one instead. Your agent hands the pause to you, and runs the next part once you reply <code>done</code>.</p>
+      </div>
+    </article>
+
+    <article class="step human" data-owner="you" id="s-conn" data-handoff="Connect both Workato connections to the bank">
+      <div class="num"><span>10</span></div>
+      <div class="body">
+        <div class="head"><h3>Connect Workato to the bank</h3></div>
+        <p>Open the connections link the script printed (in Workato: <b>Connections</b>) and connect both:</p>
+        <ul>
+          <li><b>Dewy Bank Customer API</b>: your Dewy Bank email and password from step 4. Use your bank login, not your Workato one.</li>
+          <li><b>Dewy Bank Support API</b>: the support code is already filled in, so just choose <b>Connect</b>.</li>
+        </ul>
+        <p>Wait until both show <b>Connected</b>.</p>
+        <div class="handoff only-self"><b>Then press Enter in the terminal.</b> The script pushes the three stations, starts their recipes and creates six MCP servers. This takes a few minutes. It pauses again when it needs the servers' URLs.</div>
+        <div class="handoff only-agent"><b>Then reply <code>done</code>.</b> Your agent runs the script again. It pushes the three stations, starts their recipes and creates six MCP servers, which takes a few minutes.</div>
+      </div>
+    </article>
+
+    <article class="step human" data-owner="you" id="s-mcp" data-handoff="Copy six MCP server URLs into .env">
+      <div class="num"><span>11</span></div>
+      <div class="body">
+        <div class="head"><h3>Copy your six MCP server URLs</h3></div>
+        <p>Each MCP server sits in its <b>Dewy Bank Station</b> folder in Workato. For each one, open it, generate a token, copy its URL with the token, and paste it into <code>.env</code> on its line:</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Line</th><th>MCP server</th></tr></thead>
+          <tbody>
+            <tr><td><code>A1=</code></td><td>StationA1</td></tr>
+            <tr><td><code>A2=</code></td><td>StationA2</td></tr>
+            <tr><td><code>B1=</code></td><td>StationB1</td></tr>
+            <tr><td><code>B2=</code></td><td>StationB2</td></tr>
+            <tr><td><code>C1=</code></td><td>StationC1</td></tr>
+            <tr><td><code>C2=</code></td><td>StationC2 Customer</td></tr>
+          </tbody>
+        </table></div>
+        <p>Each URL looks like <code>https://…apim.mcp.trial.workato.com/?wkt_token=…</code>. Replace the whole <code>&lt;paste …&gt;</code> placeholder.</p>
+        <div class="note">These URLs are credentials. Anyone who has one can act as you in the bank through that server, so keep them out of chats and screenshots.</div>
+        <div class="handoff only-self"><b>Save <code>.env</code>, then press Enter in the terminal.</b> The script prints your chat config and saves it to <code>mcp_conf.json</code>.</div>
+        <div class="handoff only-agent"><b>Save <code>.env</code>, then reply <code>done</code>.</b> Your agent checks all six are set and writes your chat config to <code>mcp_conf.json</code> without displaying it.</div>
+      </div>
+    </article>
+  </section>
+
+  <section class="phase">
+    <h2><span class="pn">PHASE 5</span>Connect the chat</h2>
+    <p>The last two steps happen in the bank app.</p>
+
+    <article class="step human" data-owner="you" id="s-paste" data-handoff="Paste mcp_conf.json into the bank app's chat config">
+      <div class="num"><span>12</span></div>
+      <div class="body">
+        <div class="head"><h3>Paste your config into the bank app</h3></div>
+        <ol>
+          <li>Open <code>mcp_conf.json</code> (in the repo folder) in your editor and copy all of it.</li>
+          <li>In the bank app, open the chat and choose the <b>gear</b> (Config) button.</li>
+          <li>Paste the config and save.</li>
+        </ol>
+      </div>
+    </article>
+
+    <article class="step human" data-owner="you" id="s-hello" data-handoff="Say hello to Dewy in the bank app">
+      <div class="num"><span>13</span></div>
+      <div class="body">
+        <div class="head"><h3>Say hello to Dewy</h3></div>
+        <p>In the chat, choose the <b>robot</b> (Select station) button, pick <b>A1</b>, and ask <i>“What accounts do I have?”</i> You're set up when Dewy lists your accounts.</p>
+      </div>
+    </article>
+  </section>
+</main>
+
+<section class="wrap trouble" aria-labelledby="trouble-h">
+  <h2 id="trouble-h">If something goes wrong</h2>
+  <details>
+    <summary><code>wk profile "…" is not connected</code></summary>
+    <p>The CLI isn't signed in. Do step 8 again, and check the profile name matches the one in your command.</p>
+  </details>
+  <details>
+    <summary><code>Running non-interactively; cannot wait for connections to be authenticated</code></summary>
+    <p>Expected when an agent runs the script. Connect both connections (step 10), then run the deploy script again.</p>
+  </details>
+  <details>
+    <summary><code>Connections still not authenticated after re-check</code></summary>
+    <p>Open <b>Connections</b> in Workato and check both say <b>Connected</b>. For the Customer API, use your Dewy Bank login, not your Workato one. Then run the deploy script again.</p>
+  </details>
+  <details>
+    <summary><code>expected one folder named "Dewy Bank Station …"</code> or <code>no skill …; push the project first</code></summary>
+    <p>The stations didn't finish pushing. Run the deploy script again. If it fails the same way twice, ask a facilitator.</p>
+  </details>
+  <details>
+    <summary>Dewy answers, but can't see your accounts</summary>
+    <p>Check each line in <code>.env</code> holds a full URL ending in <code>?wkt_token=…</code>. Then rebuild the config with <code>python3 scripts/setup_mcp_servers.py -p <span class="v" data-v="profile">dewy</span></code>, press Enter when it asks, and paste the new <code>mcp_conf.json</code> into the bank app.</p>
+  </details>
+  <p class="foot">Dewy Bank is deliberately insecure. It's a mock bank built for this workshop, holding no real money or customer data.</p>
+</section>
+
+<script type="text/plain" id="prompt-tpl">You're helping me set up my laptop for the Dewy Bank workshop, a Workato hands-on workshop on securing AI agents. Work through the steps below in order.
+
+Some steps can only be done by me. At each step marked HUMAN, stop and tell me in one short message exactly what to do, then wait until I reply "done". Run that step's check before you move on.
+
+Rules:
+- Never ask me to paste a password, token, support code or MCP URL into this chat. I type secrets into the .env file myself.
+- Never print .env or mcp_conf.json, and never echo a token. To see what's filled in, use the env check at the end of this prompt: it prints only "set" or "missing".
+- Don't sign up, log in or click through Workato or the bank app for me, even if you have a browser tool.
+- Don't edit, commit or push repo files. The deploy script changes and restores the station folders itself. The only file you create is .env.
+- Pass -p {{PROFILE}} on every wk command.
+- If a step fails in a way this prompt doesn't describe, stop and show me the error. Don't work around it by changing files.
+
+My values:
+- Bank app URL: {{BANK_URL}}
+- wk profile name: {{PROFILE}}
+
+1. Check that python3 and git are installed (print their versions). If either is missing, stop and tell me.
+
+2. Install the wk CLI and recipe linter if `wk version` fails:
+   brew install workato-devs/tap/wk workato-devs/tap/recipe-lint
+   wk plugins install recipe-lint
+   If Homebrew is missing, stop and ask me to install it.
+
+3. Clone the repo with git (not a ZIP; the deploy script uses git to restore files) and work inside it from now on:
+   git clone https://github.com/workato-devs/dewy-bank.git
+   cd dewy-bank
+
+4. HUMAN: Ask me to open the bank app at {{BANK_URL}}, choose Sign up, create an account, and enter the 6-digit code from the confirmation email.
+
+5. HUMAN: Ask me to sign up at https://app.trial.workato.com/users/sign_up_trial, confirm my email, and log in.
+
+6. HUMAN: Ask me to create a client role and an API client in Workato (Workspace admin > API clients), following https://github.com/workato-devs/wk#authenticate, and copy its token (it starts with wrk). The role needs these permissions:
+   - Projects > Project assets: Projects & folders, Connections, Recipes, Skills, MCP servers
+   - Projects > Recipe lifecycle management: Recipe lifecycle management, Export manifests
+   - Tools > Connector SDKs: Connector SDKs
+   - Admin > Workspace details: Workspace details
+   Tell me that if I'm unsure, selecting every permission is fine: the trial workspace exists only for this workshop.
+
+7. Run: cp .env.example .env
+   HUMAN: Ask me to open .env in my editor and fill in WORKATO_API_TOKEN (the token), SPA_URL ({{BANK_URL}}) and DEWY_SUPPORT_API_KEY (the support code from my facilitator), leaving A1 to C2 alone.
+   Check: run the env check. WORKATO_API_TOKEN, SPA_URL and DEWY_SUPPORT_API_KEY must be "set".
+
+8. Create the wk profile, reading the token from .env so it never shows:
+   wk auth login --token "$(grep '^WORKATO_API_TOKEN=' .env | cut -d= -f2- | tr -d '"')" --environment dev --region trial --name {{PROFILE}} --no-input
+   Check: wk auth status -p {{PROFILE}} reports it's connected. If macOS shows a keychain prompt, ask me to allow it.
+
+9. First deploy run. Stdin is closed on purpose, so the script stops at its pauses instead of hanging:
+   python3 scripts/deploy_workato.py -p {{PROFILE}} < /dev/null
+   On a new workspace it stops at "Step 2b: connections need authentication" and exits with "Running non-interactively; cannot wait for connections to be authenticated". That's expected. Note the connections URL it printed.
+   If it says the connections are already authenticated, it keeps going: skip step 10 and treat this run as step 11.
+
+10. HUMAN: Ask me to open that connections URL and connect "Dewy Bank Customer API" with my Dewy Bank email and password (my bank login, not Workato's), and "Dewy Bank Support API" by just choosing Connect. Both must show Connected.
+
+11. Second deploy run, same command:
+    python3 scripts/deploy_workato.py -p {{PROFILE}} < /dev/null
+    It pushes three stations, starts their recipes, and creates six MCP servers. It takes a few minutes. Success looks like a line "<server>: N tools, as specified" for each of StationA1, StationA2, StationB1, StationB2, StationC1 and StationC2 Customer, then an EOFError at "Press Enter when mcp_servers.env is saved". That EOFError is expected: the script is waiting for the MCP URLs. Any other failure: stop and show me.
+
+12. HUMAN: Ask me to open each of the six MCP servers in Workato (each is in its Dewy Bank Station folder), generate a token, copy its URL with the token, and paste it into .env: A1=StationA1, A2=StationA2, B1=StationB1, B2=StationB2, C1=StationC1, C2=StationC2 Customer.
+    Check: run the env check. All nine values must be "set".
+
+13. Generate the chat config. The script prints the config (which holds the URLs) to stdout, so discard stdout; it also saves the config to mcp_conf.json:
+    printf '\n' | python3 scripts/setup_mcp_servers.py -p {{PROFILE}} > /dev/null
+    Check: mcp_conf.json exists (use ls; don't print it).
+
+14. HUMAN: Ask me to open mcp_conf.json in my editor, copy all of it, then in the bank app open the chat, choose the gear (Config) button, paste it and save.
+
+15. HUMAN: Ask me to choose the robot (Select station) button in the chat, pick A1, and ask "What accounts do I have?". Setup is done when Dewy lists my accounts. Tell me setup is complete.
+
+Env check (prints only set or missing, never the values):
+python3 - <<'EOF'
+env = {}
+for line in open('.env'):
+    key, sep, value = line.strip().partition('=')
+    if sep and not key.startswith('#'):
+        env[key.strip()] = value.strip().strip('"\'')
+for key in ['WORKATO_API_TOKEN', 'SPA_URL', 'DEWY_SUPPORT_API_KEY', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2']:
+    value = env.get(key, '')
+    print(key, 'set' if value and not value.startswith('<') else 'missing')
+EOF
+</script>
+
+<script>
+(function () {
+  var store = {
+    get: function (k) { try { return localStorage.getItem('dewy-setup:' + k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem('dewy-setup:' + k, v); } catch (e) {} }
+  };
+  var $ = function (id) { return document.getElementById(id); };
+  var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+  var bankIn = $('in-bank'), profIn = $('in-profile');
+
+  bankIn.value = store.get('bank') || '';
+  profIn.value = store.get('profile') || 'dewy';
+
+  function clean(u) { return u.trim().replace(/\/+$/, ''); }
+  function values() {
+    return { bank: clean(bankIn.value), profile: profIn.value.trim().replace(/\s+/g, '-') || 'dewy' };
+  }
+
+  function render() {
+    var v = values();
+    document.querySelectorAll('[data-v="bank"]').forEach(function (el) { el.textContent = v.bank || 'your bank app URL'; });
+    document.querySelectorAll('[data-v="profile"]').forEach(function (el) { el.textContent = v.profile; });
+    document.querySelectorAll('[data-v="bank-link"]').forEach(function (a) {
+      if (/^https:\/\//.test(v.bank)) { a.href = v.bank; a.removeAttribute('aria-disabled'); }
+      else { a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); }
+    });
+    $('prompt-text').textContent = promptText();
+  }
+
+  function promptText() {
+    var v = values();
+    return $('prompt-tpl').textContent.trim()
+      .replace(/\{\{BANK_URL\}\}/g, v.bank || '<ask me for the bank app URL>')
+      .replace(/\{\{PROFILE\}\}/g, v.profile);
+  }
+
+  bankIn.addEventListener('input', function () { store.set('bank', bankIn.value); render(); });
+  profIn.addEventListener('input', function () { store.set('profile', profIn.value); render(); });
+
+  // Path switch
+  function setPath(p) {
+    document.body.classList.toggle('agent', p === 'agent');
+    document.body.classList.toggle('self', p !== 'agent');
+    $('path-self').setAttribute('aria-pressed', p !== 'agent');
+    $('path-agent').setAttribute('aria-pressed', p === 'agent');
+    steps.forEach(function (s) {
+      var owner = s.dataset.owner, head = s.querySelector('.head'), chip = head.querySelector('.chip');
+      if (!chip) { chip = document.createElement('span'); head.querySelector('h3').after(chip); }
+      if (owner === 'you') { chip.className = 'chip you'; chip.textContent = 'You'; }
+      else if (p === 'agent') { chip.className = 'chip agent'; chip.textContent = 'Your agent'; }
+      else { chip.className = 'chip run'; chip.textContent = 'Terminal'; }
+    });
+    store.set('path', p);
+  }
+  $('path-self').addEventListener('click', function () { setPath('self'); });
+  $('path-agent').addEventListener('click', function () { setPath('agent'); });
+
+  // Hand-off list
+  var hand = steps.filter(function (s) { return s.dataset.handoff; });
+  $('handoff-count').textContent = hand.length;
+  hand.forEach(function (s) {
+    var li = document.createElement('li');
+    li.textContent = s.dataset.handoff + ' (step ' + s.querySelector('.num span').textContent + ')';
+    $('handoff-list').appendChild(li);
+  });
+
+  // Progress checkboxes
+  $('total-n').textContent = steps.length;
+  function updateProgress() {
+    var n = steps.filter(function (s) { return s.classList.contains('done'); }).length;
+    $('done-n').textContent = n;
+    $('bar').style.width = (100 * n / steps.length) + '%';
+  }
+  steps.forEach(function (s) {
+    var label = document.createElement('label');
+    label.className = 'check';
+    var box = document.createElement('input');
+    box.type = 'checkbox'; box.id = 'done-' + s.id;
+    box.checked = store.get('done:' + s.id) === '1';
+    s.classList.toggle('done', box.checked);
+    box.addEventListener('change', function () {
+      s.classList.toggle('done', box.checked);
+      store.set('done:' + s.id, box.checked ? '1' : '0');
+      updateProgress();
+    });
+    label.appendChild(box);
+    label.appendChild(document.createTextNode('Done'));
+    s.querySelector('.head').appendChild(label);
+  });
+  $('reset').addEventListener('click', function () {
+    steps.forEach(function (s) {
+      var box = s.querySelector('.check input');
+      box.checked = false; s.classList.remove('done'); store.set('done:' + s.id, '0');
+    });
+    updateProgress();
+  });
+
+  // Copy buttons on code blocks
+  function copyText(text, btn, label) {
+    function ok() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = label; }, 1600); }
+    function fallback(el) {
+      var r = document.createRange(); r.selectNodeContents(el);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      btn.textContent = 'Press ⌘C to copy';
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, function () { fallback(btn._target); });
+    } else { fallback(btn._target); }
+  }
+  document.querySelectorAll('.step .code pre').forEach(function (pre) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'copy'; b.textContent = 'Copy'; b._target = pre;
+    b.addEventListener('click', function () { copyText(pre.textContent, b, 'Copy'); });
+    pre.parentNode.appendChild(b);
+  });
+  var cp = $('copy-prompt');
+  cp._target = $('prompt-text');
+  cp.addEventListener('click', function () {
+    if ($('prompt-box').hidden) { $('prompt-box').hidden = false; $('toggle-prompt').setAttribute('aria-expanded', 'true'); $('toggle-prompt').textContent = 'Hide the prompt'; }
+    copyText(promptText(), cp, 'Copy agent prompt');
+  });
+  $('toggle-prompt').addEventListener('click', function () {
+    var box = $('prompt-box'); box.hidden = !box.hidden;
+    this.setAttribute('aria-expanded', String(!box.hidden));
+    this.textContent = box.hidden ? 'Show the prompt' : 'Hide the prompt';
+  });
+
+  setPath(store.get('path') === 'agent' ? 'agent' : 'self');
+  render();
+  updateProgress();
+})();
+</script>
+
+</body></html>
