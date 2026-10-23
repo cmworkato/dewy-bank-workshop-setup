@@ -471,8 +471,14 @@ wk auth status -p <span class="v" data-v="profile">dewy</span></pre></div>
     <p>Open <b>Connections</b> in Workato and check both say <b>Connected</b>. For the Customer API, use your Dewy Bank login, not your Workato one. Then run the deploy script again.</p>
   </details>
   <details>
-    <summary><code>expected one folder named "Dewy Bank Station …"</code> or <code>no skill …; push the project first</code></summary>
+    <summary><code>expected one folder named "Dewy Bank Station …"</code></summary>
     <p>The stations didn't finish pushing. Run the deploy script again. If it fails the same way twice, ask a facilitator.</p>
+  </details>
+  <details>
+    <summary>No MCP servers in Workato after the deploy, or <code>no skill …; push the project first</code></summary>
+    <p>The script stopped before it created the servers. The usual cause is that Workato hadn't finished registering the stations' skills when the script looked for them. Wait a minute, then run just the MCP step again:</p>
+    <p><code>python3 scripts/setup_mcp_servers.py -p <span class="v" data-v="profile">dewy</span></code></p>
+    <p>It's safe to rerun: it finds each server by name, fixes only what's missing, and never renews a token. When it prints <code>StationC2 Customer: … tools, as specified</code>, carry on from step 11. If it fails the same way twice, run the deploy script again, then ask a facilitator.</p>
   </details>
   <details>
     <summary>Dewy answers, but can't see your accounts</summary>
@@ -536,7 +542,10 @@ My values:
 
 11. Second deploy run, same command:
     python3 scripts/deploy_workato.py -p {{PROFILE}} < /dev/null
-    It pushes three stations, starts their recipes, and creates six MCP servers. It takes a few minutes. Success looks like a line "<server>: N tools, as specified" for each of StationA1, StationA2, StationB1, StationB2, StationC1 and StationC2 Customer, then an EOFError at "Press Enter when mcp_servers.env is saved". That EOFError is expected: the script is waiting for the MCP URLs. Any other failure: stop and show me.
+    It pushes three stations, starts their recipes, and creates six MCP servers. It takes a few minutes. Success looks like a line "<server>: N tools, as specified" for each of StationA1, StationA2, StationB1, StationB2, StationC1 and StationC2 Customer, then it exits with "Deployment paused: the MCP servers are set up, but .env still needs their URLs". That exit is expected: the script is waiting for the MCP URLs.
+    If it fails with "no skill …; push the project first" (no MCP servers get created), wait a minute and run this once; it's safe to rerun:
+    python3 scripts/setup_mcp_servers.py -p {{PROFILE}} < /dev/null
+    Success looks the same as above. Any other failure, or the same failure twice: stop and show me.
 
 12. HUMAN: Ask me to open each of the six MCP servers in Workato (each is in its Dewy Bank Station folder), generate a token, copy its URL with the token, and paste it into .env: A1=StationA1, A2=StationA2, B1=StationB1, B2=StationB2, C1=StationC1, C2=StationC2 Customer.
     Check: run the env check. All nine values must be "set".
